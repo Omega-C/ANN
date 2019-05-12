@@ -1,0 +1,18 @@
+import numpy as np
+import random
+
+def sig(x,d=False):
+	if d:
+		return 2*(1-x)
+	return 1/(1+np.exp(-x))
+
+def weight_setup(inp,hid,out):
+	if 0 in (inp,hid,out):
+		1/0
+	return [(2*np.random.random((inp,hid))-1),(2*np.random.random((hid,out))-1)]
+
+def layer_setup(inp,weights):
+	layers=[inp]
+	for i in weights:
+		layers.append(sig(np.dot(layers[-1],i)))
+	return layers
