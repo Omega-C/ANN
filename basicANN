@@ -1,0 +1,70 @@
+import numpy as np
+import random
+
+class basicANN:
+	def run(inp):
+		self=basicANN
+		inp=np.array(inp)
+		return self._layer_setup(inp)[-1]
+	
+	def _weight(x,y):
+		np.random.seed(random.randint(1,50000))
+		return 2*np.random.random((x,y))-1
+	
+	def _error(d,w):
+		return d.dot(w.T)
+	
+	def _deriv(e,l):
+		self=basicANN
+		return e*self._sig(l,d=True)
+	
+	def _sig(x,d=False):
+		if d:
+			return 2*(1-x)
+		return 1/(1+np.exp(-x))
+	
+	def weight_setup(dim):
+		self=basicANN
+		self.weights=[]
+		if 0 in dim:
+			1/0
+		for i in range(len(dim)-1):
+			self.weights.append(self._weight(dim[i],dim[i+1]))
+	
+	def _layer_setup(inp):
+		self=basicANN
+		layer=[inp]
+		for i in self.weights:
+			layer.append(self._sig(np.dot(layer[-1],i)))
+		return layer
+	
+	def _error_derivative(output,layers):
+		self=basicANN
+		weights=self.weights
+		der=[]
+		eror=[]
+		eror.append(output-layers[-1])
+		der.append(self._deriv(eror[-1],layers[-1]))
+		for i in range(len(weights)-1):
+			i*=-1
+			i-=1
+			eror.append(self._error(der[-1],weights[i]))
+			der.append(self._deriv(eror[-1],layers[i-1]))
+		der.reverse()
+		eror.reverse()
+		self.error=eror
+		return der
+	
+	def _weight_add(l,d):
+		self=basicANN
+		w=self.weights
+		for i in range(len(w)):
+			i=-1
+			w[i]+=l[i-1].T.dot(d[i])
+		self.weights=w
+	
+	def train(inp,out):
+		self=basicANN
+		layers=self._layer_setup(inp)
+		derivatives=self._error_derivative(out,layers)
+		self._weight_add(layers,derivatives[0])
